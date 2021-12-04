@@ -35,7 +35,7 @@ var chosenYAxis = "healthcare";
 function xScale(data, chosenXAxis) {
   // create scales
   var xLinearScale = d3.scaleLinear()
-    .domain([d3.min(data, d => d[chosenXAxis])-1, d3.max(data, d => d[chosenXAxis])+1])
+    .domain([d3.min(data, d => d[chosenXAxis]) - 1, d3.max(data, d => d[chosenXAxis]) + 1])
     .range([0, width]);
 
   return xLinearScale;
@@ -45,8 +45,8 @@ function xScale(data, chosenXAxis) {
 function yScale(data, chosenYAxis) {
   // create scales
   var yLinearScale = d3.scaleLinear()
-    .domain([0, d3.max(data, d => d[chosenYAxis])+1])
-    .range([height,0]);
+    .domain([0, d3.max(data, d => d[chosenYAxis]) + 1])
+    .range([height, 0]);
 
   return yLinearScale;
 
@@ -152,7 +152,7 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
 var url = "assets/data/data.csv";
 // Retrieve data from the CSV file and execute everything below
 d3.csv(url).then(function (data) {
-  
+
   console.log(data)
 
   // parse data
@@ -173,6 +173,36 @@ d3.csv(url).then(function (data) {
   var yLinearScale = yScale(data, chosenYAxis);
 
 
+
+  // append initial circles
+  var circlesGroup = chartGroup.selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("cx", d => xLinearScale(d[chosenXAxis]))
+    .attr("cy", d => yLinearScale(d[chosenYAxis]))
+    .attr("r", 15)
+    .attr("fill", "cyan")
+    .attr("opacity", ".5")
+    .attr("stroke", "black");
+
+
+
+  console.log(data)
+
+  var textGroup = chartGroup.selectAll("text")
+    .data(data)
+    .enter()
+    .append("text")
+    .attr("x", d => xLinearScale(d[chosenXAxis]))
+    .attr("y", d => yLinearScale(d[chosenYAxis]))
+    .text(function (d) { return d.abbr })
+    .attr("font-family", "sans-serif")
+    .attr("font-size", "10px")
+    .attr("fill", "black")
+    .attr("text-anchor", "middle")
+    .attr("alignment-baseline", "middle")
+
   // Create initial axis functions
   var bottomAxis = d3.axisBottom(xLinearScale);
   var leftAxis = d3.axisLeft(yLinearScale);
@@ -187,38 +217,6 @@ d3.csv(url).then(function (data) {
     .classed("y-axis", true)
     .attr("transform", `translate(0, 0)`)
     .call(leftAxis);
-
-
-
-  // append initial circles
-  var circlesGroup = chartGroup.selectAll("circle")
-    .data(data)
-    .enter()
-    .append("circle")
-    .attr("cx", d => xLinearScale(d[chosenXAxis]))
-    .attr("cy", d => yLinearScale(d[chosenYAxis]))
-    .attr("r", 15)
-    .attr("fill", "cyan")
-    .attr("opacity", ".5")
-    .attr("stroke", "black");
-
-  
-  console.log(data)
-
-  var textGroup = chartGroup.selectAll("text")
-    .data(data)
-    .enter()
-    .append("text")
-    .attr("x", d => xLinearScale(d[chosenXAxis]))
-    .attr("y", d => yLinearScale(d[chosenYAxis]))
-    .text(function(d) {return d.abbr})
-    .attr("font-family", "sans-serif")
-    .attr("font-size", "10px")
-    .attr("fill", "black")
-    .attr("text-anchor", "middle")
-    .attr("alignment-baseline", "middle");
-    
-
 
   // Create group for x-axis labels
   var labelsGroupX = chartGroup.append("g")
@@ -272,7 +270,7 @@ d3.csv(url).then(function (data) {
     .attr("value", "obesity") // value to grab for event listener
     .classed("inactive", true)
     .text("Obese (%)");
-    
+
 
 
   // updateToolTip function above csv import
@@ -301,7 +299,7 @@ d3.csv(url).then(function (data) {
 
         // updates tooltips with new info
         circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
-        
+
 
         // changes classes to change bold text
         if (chosenXAxis === "poverty") {
@@ -314,7 +312,7 @@ d3.csv(url).then(function (data) {
           incomeLabel
             .classed("active", false)
             .classed("inactive", true);
-          
+
         }
         else if (chosenXAxis === "age") {
           povertyLabel
@@ -343,7 +341,7 @@ d3.csv(url).then(function (data) {
       }
     });
 
-    labelsGroupY.selectAll("text")
+  labelsGroupY.selectAll("text")
     .on("click", function () {
       // get value of selection
       var valueY = d3.select(this).attr("value");
